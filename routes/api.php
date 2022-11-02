@@ -21,9 +21,10 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 
 Route::controller(App\Http\Controllers\BookController::class,)->group(function () {
+       Route::get('v1/books/{id}', 'getBook');
        Route::get('v1/books', 'getBooks');
        Route::post('v1/books', 'createBook');
-       Route::patch('update', 'updateBook');
+       Route::patch('v1/books/{id}', 'updateBook');
        Route::delete('v1/books/{id}', 'deleteBook');
        Route::get('external-books/{name}', 'getExternalBooks');
 });

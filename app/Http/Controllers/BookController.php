@@ -14,72 +14,97 @@ use App\Http\Requests\BookStoreRequest;
 
 class BookController extends Controller
 {
-    // database call and data extraction
-    private function dbCall($from, $to){
-        $submissions =  DB::table('kgmpopcorn_posts')->
-        join('kgmpopcorn_postmeta' , 'kgmpopcorn_posts.ID' , '=','kgmpopcorn_postmeta.post_id')
-        ->orderBy('post_date', 'desc')->
-        select ('kgmpopcorn_posts.post_date','kgmpopcorn_posts.ID', 
-        'kgmpopcorn_posts.post_type','kgmpopcorn_postmeta.meta_id',
-         'kgmpopcorn_postmeta.meta_value', 'kgmpopcorn_postmeta.meta_key') ->
-           where('kgmpopcorn_postmeta.meta_key' , '=', 'sb_elem_cfd')
-             ->whereBetween('post_date', [$from, $to])
-             ->simplePaginate(30)
-             ->toArray();
 
+    // update utility
+    private function updateUtil(Request $request, $id){
+        $name = $request->name ?? '';
+        $isbn = $request->isbn ?? '';
+        $authors = $request->authors ?? '';
+        $country = $request->country ?? '';
+        $number_of_pages = $request->number_of_pages ?? '';
+        $publisher = $request->publisher ?? '';
+        $release_date = $request->release_date ?? '';
+        
+        // condense request body to an array
+        $data = ["name" => $name,
+        "isbn" => $isbn,
+        "authors" => $authors,
+        "country" => $country,
+        "number_of_pages" => $number_of_pages,
+        "publisher" => $publisher,
+        "release_date" => $release_date];
 
-     $final_results = array();
-     foreach ($submissions['data'] as $sub) {
-                 $meta = $sub->meta_value;
-                 $date = $sub->post_date;
-                 $metad = $sub->meta_id;
-                 $id = $sub->ID;
- 
-         // make the results to an array
-         $fin = explode('}', $meta);
-         $form_results = array();
- 
- // extract form submission values that we need
- $form_result[0] = substr($fin[0], strpos($fin[0], "value") + 12);   
- $form_result[1] = substr($fin[1], strpos($fin[1], "value") +12); 
- $form_result[2] = substr($fin[2], strpos($fin[2], "value") +13); 
- $form_result[3] = substr($fin[3], strpos($fin[3], "value") +12); 
- $form_result[4] = substr($fin[4], strpos($fin[4], "value") +13);  
- 
- // remove semi-colons
- $form_results['Name'] = str_replace(';', '', $form_result[0]);
- $form_results['Email'] = str_replace(';', '', $form_result[1]);
- $form_results['Contact'] = str_replace(';', '', $form_result[2]);
- $form_results['Message'] = str_replace(';', '', $form_result[3]);
- $form_results['Extra'] = str_replace(';', '', $form_result[4]);
- $form_results['Date of submission'] = $date;
- 
- // send sanitized results to a final array 
- //$final_results[] = array_slice($form_results, 0,6,true);
- $final_results[] = $form_results;
- 
- }
- 
- $prev_indi = $submissions['prev_page_url'];
- $next_indi = $submissions['next_page_url'];
- 
- if(isset($submissions['prev_page_url']) && ($submissions['prev_page_url'] !='')){
- $prev = "$prev_indi&from=$from&to=$to"; 
- }
- else $prev = '';
- 
- if(isset($submissions['next_page_url']) && ($submissions['next_page_url'] !='')){
-     $next = "$next_indi&from=$from&to=$to"; 
-     }
-     else $next = '';
-
-     $data = ['data' => $final_results, 'prev' => $prev, 'next' => $next];
-
-     return $data;
+        $fin_data = array();
     
+        // loop tru the array and remove update items which are not set
+        foreach($data as $key => $val){
+            if($val === '')continue;
+            $fin_data[$key] = $val;
+        }
+
+        return $fin_data;
     }
 
+    
+// get data util
+   private function getData($id){
+    $book = Book::where('id', $id)->first();
+    $resp_data = array();
 
+   if(!empty($book)){
+    $resp_data['id'] = $book['id'];
+    $resp_data['name'] = $book['name'];
+    $resp_data['isbn'] = $book['isbn'];
+    $resp_data['authors'] = array($book['authors']);
+    $resp_data['number_of_pages'] = $book['number_of_pages'];
+    $resp_data['publisher'] = $book['publisher'];
+    $resp_data['country'] = $book['country'];
+    $resp_data['release_date'] = $book['release_date'];
+   }
+   
+    return $resp_data;
+}
+
+// external books API util
+private function apiCall($name){
+    $response = Http::withHeaders([ 
+        'Accept'=> 'application/json'
+    ]) 
+    ->get('https://www.anapioficeandfire.com/api/books?name='.$name); 
+
+$result = json_decode($response->body(), true);
+
+return $result;
+}
+
+
+public function getExternalBooks($name)
+{
+$resp = self::apiCall($name);
+$resp_fin = array();
+
+// build response object
+if(!empty($resp)){
+foreach($resp as $res){
+    $resp_fin[] = array('name' => $res['name'], 'isbn' => $res['isbn'], 
+    'authors' => $res['authors'], 'number_of_pages' => $res['numberOfPages']
+    ,'publisher' => $res['publisher'],'country' => $res['country'],
+    'release_date' => $res['released']);   
+}
+
+return response()->json(['status' => 'success', 'data' => $resp_fin], 200)->header('Content-Type', 'application/json');
+
+}
+
+else{
+    $resp_fin['status'] = "not found";
+    $resp_fin['data']  = array();
+
+    return response()->json([ $resp_fin], 404)->header('Content-Type', 'application/json');
+
+}
+
+}
 
 // create books
 public function createBook(BookStoreRequest $request){
@@ -123,7 +148,7 @@ public function getBooks(){
 
     foreach($books as $book){
         $resp_data[] = array('id' => $book['id'],'name' => $book['name'], 'isbn' => $book['isbn'], 
-        'authors' => $book['authors'], 'number_of_pages' => $book['number_of_pages']
+        'authors' => array($book['authors']), 'number_of_pages' => $book['number_of_pages']
         ,'publisher' => $book['publisher'],'country' => $book['country'],
         'release_date' => $book['release_date']);  
         
@@ -135,60 +160,75 @@ public function getBooks(){
     
 }
 
-// update book
-public function updateBook(){
-    $books = Book::all();
-    print_r($books);
+// get book
+public function getBook($id){
+    $book = self::getData($id);
+
+    if(!empty($book)){
+    return response()->json(['status' => 'success',
+             'data' => $book], 200);
 }
 
-// delete book
-public function deleteBook($id){
-try{
-    $book = Book::where('id', $id)->get()->delete();
-   // $user->posts->pluck('id')
-}
-    catch (\Illuminate\Database\QueryException $e) {
-        return response()->json(['message' => $e], 400);
+    else{
+        return response()->json(['status' => 'failed', 
+   'message' => 'The book with id '.$id.' was not found',
+    'data' => array()], 404);
     }
-    echo "hii==$book";
+    
+}
+
+// update book
+public function updateBook(Request $request, $id){
+    $fin_data = self::updateUtil($request, $id);
+
+    // perform the update
+       try{
+            $bookUpdated = Book::where("id", $id)->update(
+                $fin_data
+            );
+            $data = self::getData($id);
+            $name = $data['name'];
+        }
+        catch (\Illuminate\Database\QueryException $e) {
+            return response()->json(['message' => $e], 400);
+        }
+
+        return response()->json(['status' => 'success', 
+   'message' => 'The book '.$name.' was updated successfully',
+    'data' => $data], 200);
+    }
+
+
+
+    // delete book
+public function deleteBook($id){
+    $book = Book::where('id', $id)->first();
+    
+    if(!empty($book)){
+        $name =  $book->name;
+        try{
+        $book->delete();
+        }
+        catch (\Illuminate\Database\QueryException $e) {
+            return response()->json(['message' => $e], 400);
+        }
+
+        return response()->json(['status' => 'success', 
+   'message' => 'The book '.$name.' was deleted successfully',
+    'data' => array()], 202);
+    }
+
+
+    else{
+        return response()->json(['status' => 'failed', 
+   'message' => 'The book with id '.$id.' was not found',
+    'data' => array()], 404);
+    }
+   
+ 
 }
 
 
-// external books API
-public function getExternalBooks($name)
-{
-    $response = Http::withHeaders([ 
-        'Accept'=> 'application/json'
-    ]) 
-    ->get('https://www.anapioficeandfire.com/api/books?name='.$name); 
-
-$resp = json_decode($response->body(), true);
-$resp_fin = array();
-
-
-// build response object
-if(!empty($resp)){
-foreach($resp as $res){
-    $resp_fin[] = array('name' => $res['name'], 'isbn' => $res['isbn'], 
-    'authors' => $res['authors'], 'number_of_pages' => $res['numberOfPages']
-    ,'publisher' => $res['publisher'],'country' => $res['country'],
-    'release_date' => $res['released']);   
-}
-
-return response()->json(['status' => 'success', 'data' => $resp_fin], 200)->header('Content-Type', 'application/json');
-
-}
-
-else{
-    $resp_fin['status'] = "not found";
-    $resp_fin['data']  = array();
-
-  
-    return response()->json([ $resp_fin], 404)->header('Content-Type', 'application/json');
-
-}
-
-}
 
 
 }
