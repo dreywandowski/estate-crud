@@ -186,6 +186,12 @@ public function updateBook(Request $request, $id){
             $bookUpdated = Book::where("id", $id)->update(
                 $fin_data
             );
+            if($bookUpdated == 0){
+                return response()->json(['status' => 'fail', 
+                'message' => 'Unable to update book, because no book with id '.$id.' was found',
+                 'data' => array()], 404);
+                 }
+
             $data = self::getData($id);
             $name = $data['name'];
         }
