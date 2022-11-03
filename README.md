@@ -14,8 +14,8 @@ Also to get a specific book from an external API source.
  
 
  ### Documentation
- This is the live link to the root of the project: https://estate.dreywandowski.xyz/api .... 
- However the specific routes for each endpoints have been defined in the documentation page here:
+ This is the live link to the root of the project: https://estate-api.dreywandowski.xyz/api,
+ However, how to access each of the specific routes for each endpoints have been defined in the documentation page here:
  https://dreywandowski.xyz/api_documentations/estate_books_api/
  
 
@@ -32,7 +32,7 @@ Also to get a specific book from an external API source.
  
  ### Comments
  - Feature testing Using the "BookTest" feature test file.
- <img src="https://dreywandowski.xyz/images/ Screenshot 2022-11-03 at 09.46.21.png" width="350" height="150"></a></p>
+ <img src="https://dreywandowski.xyz/images/Screenshot 2022-11-03 at 09.46.21.png" width="350" height="150"></a></p>
 
     
 
