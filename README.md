@@ -1,4 +1,4 @@
-<p align="center"><a href="https://estate-api.dreywandowski.xyz/" target="_blank"><img src="https://dreywandowski.xyz/images/Student-Hour.svg" width="350" height="150"></a></p>
+<p align="center"><a href="https://estate-api.dreywandowski.xyz/" target="_blank"><img src="https://dreywandowski.xyz/images/bts4.svg" width="350" height="150"></a></p>
 
 <p align="center">
 <a href="#"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
