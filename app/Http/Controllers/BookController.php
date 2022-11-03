@@ -221,7 +221,7 @@ public function deleteBook($id){
 
         return response()->json(['status' => 'success', 
    'message' => 'The book '.$name.' was deleted successfully',
-    'data' => array()], 202);
+    'data' => array()], 200);
     }
 
 

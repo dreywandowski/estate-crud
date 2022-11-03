@@ -119,13 +119,13 @@ class BookTest extends TestCase
           $response->assertStatus(404);
         }
     
-         // test delete book -- 202
+         // test delete book -- 200
          public function test_delete_book_success()
          {
              $response = $this->delete('/api/v1/books/19');
      
      
-           $response->assertStatus(202);
+           $response->assertOk();
          }
 
          // test delete book -- 404
