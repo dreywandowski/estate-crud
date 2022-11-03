@@ -1,4 +1,4 @@
-<p align="center"><a href="https://estate-api.dreywandowski.xyz/" target="_blank"><img src="https://dreywandowski.xyz/images/studentbooks.svg" width="350" height="150"></a></p>
+<p align="center"><a href="https://estate-api.dreywandowski.xyz/" target="_blank"><img src="https://dreywandowski.xyz/images/bts4.svg" width="350" height="150"></a></p>
 
 <p align="center">
 <a href="#"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
@@ -32,7 +32,7 @@ Also to get a specific book from an external API source.
  
  ### Comments
  - Feature testing Using the "BookTest" feature test file.
- <img src="https://dreywandowski.xyz/images/Screenshot 2022-11-03 at 09.46.21.png" width="350" height="150"></a></p>
+ <img src="https://dreywandowski.xyz/images/Screenshot 2022-11-03 at 09.46.21.png" width="320" height="200"></a></p>
 
     
 
