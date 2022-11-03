@@ -14,11 +14,13 @@ Also to get a specific book from an external API source.
  
 
  ### Documentation
- This is the live link to the root of the project: https://estate-api.dreywandowski.xyz/api. 
+ The project has been deployed and hosted online for testing here: https://estate-api.dreywandowski.xyz. 
 
-
- However, how to access each of the specific routes for each endpoints have been defined in the documentation page here:
+In order to access each of the specific routes for each endpoints, instructions have been defined in the documentation page here:
  https://dreywandowski.xyz/api_documentations/estate_books_api/
+
+
+ If you want to deploy and test locally however, follow the instructions below and then use the documentation link above as a guide for testing, then replace the live URL with 127.0.0.1:8000/api as your base URL:
  
 
   ### Deployment Instructions for local use
