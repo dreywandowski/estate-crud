@@ -35,7 +35,7 @@ In order to access each of the specific routes for each endpoints, instructions 
   - Run tests via **php artisan test**
  
  ### Comments
- - Feature testing Using the "BookTest" feature test file under the tests/Feature folder. Edit values in the various test methods to get consistent results with your database.
+ - Feature testing Using the "BookTest" feature test file under the tests/Feature folder. Edit values in the various test methods to get consistent results with your database.<br><br>
  <img src="https://dreywandowski.xyz/images/Screenshot 2022-11-03 at 09.46.21.png" width="320" height="200"></a></p>
 
  - In the Delete Endpoint instruction, it was specified that status code 204 be returned. However, according to information found here: https://www.rfc-editor.org/rfc/rfc2616#section-10.2.5, a 204 response doesn't have a message body, so the message required in the instruction will not show after a successful deletion.
